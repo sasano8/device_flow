@@ -1,0 +1,44 @@
+project:
+  name: ""
+  description: str = ""
+
+icons:
+  - id: xxxx
+    params: 
+      type: url
+      url: "aaaa"
+  - id: xxxx
+    params: 
+      type: file
+      path: "aaaa"
+entity:
+  - id: xxxx
+    params:
+      type: device
+    coordinates: [1, 2]
+  - id: xxx
+    params:
+      type: checkpoint
+    coordinates: [1, 2]
+world:
+  type: FeatureCollection
+  features:
+  - type: Feature
+    geometry:
+      type: Point  # Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon, GeometryCollection
+      coordinates:
+      - 102
+      - 0.5
+    properties:
+      deviceId: value0
+      icon: id-1
+  - type: Feature
+    geometry:
+      type: LineString
+      coordinates:
+      - [102, 0]
+      - [103, 1]
+      - [104, 0]
+      - [105, 1]
+    properties:
+      deviceId: value0
