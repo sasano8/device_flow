@@ -5,6 +5,7 @@
 * ネットワークプロトコル
   * Nostr
   * AT protocol
+  * active pub
 * 学習フェーズ
   * 運航予定を定義する
   * リアルタイムな車両位置情報を収集する
@@ -85,3 +86,10 @@
 * Bot開発（これは将来的な構想で見積もりには含まない）
   * 特定の駅への到着見込みを回答する
   * 車両の事故状況など回答する
+
+
+
+# nostr tutorial
+
+* https://qiita.com/gpsnmeajp/items/2f95d4adf188276146d8
+* https://piehost.com/websocket-tester

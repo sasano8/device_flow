@@ -592,6 +592,52 @@ function detect_abnormal_position() {
     // 短期間での移動距離が大きい場合は、異常とみなす
 }
 
+function get_ws_server(){
+    const WebSocket = require('ws');
+    const wss = new WebSocket.Server({ port: 8000 });
+
+    wss.on('connection', ws => {
+        console.log('Client connected');
+
+        ws.on('message', message => {
+            console.log('Received:', message);
+            // Echo the message back
+            ws.send(message);
+        });
+
+        ws.on('close', () => {
+            console.log('Client disconnected');
+        });
+    });
+
+}
+
+function get_ws_client(url, onmessage, onclose){
+    const ws = new WebSocket(url);
+    ws.onopen = function() {
+        console.log('WebSocket connection established');
+        const nostrEvent = {
+            id: 0,
+            pubkey: "ユーザー公開鍵",
+            created_at: Date.now(),
+            kind: 1,
+            content: {
+                text: "イベントの説明やメッセージ"
+            }
+        };
+        ws.send(JSON.stringify(nostrEvent));
+    };
+    
+    ws.onmessage = function(event) {
+        onmessage(event);
+    };
+    
+    ws.onclose = function() {
+        onclose(event);
+    };
+}
+
+
 </script>
 </body>
 </html>
