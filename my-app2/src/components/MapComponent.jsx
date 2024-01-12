@@ -1,37 +1,40 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { WebSocketContext } from './WebSocketComponent'
-
+import { WebSocketContext, WebSocketKindHandlers } from './WebSocketComponent'
+import { GeoJSON, MapContainer, TileLayer, Marker } from "react-leaflet";
+import geohash from "ngeohash";
 
 const geojsonData = {
     "type": "FeatureCollection",
-    "features": [{
-            "type": "Feature",
-            "properties": {
-                "popupContent": "Train A",
-                "amenity": "Baseball Stadium"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    139.95027239072502 + 0.01,
-                    36.554560344660054 + 0.01,
-                ]
-            }
-        },
-        {
-            "type": "Feature",
-            "properties": {
-                "popupContent": "Train B",
-                "show_on_map": false
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    139.95027239072502 - 0.01,
-                    36.554560344660054 - 0.01,
-                ]
-            }
-        },
+    "features": [
+        // {
+        //     "type": "Feature",
+        //     "properties": {
+        //         "title": "Train A",
+        //         "popupContent": "Train A",
+        //     },
+        //     "geometry": {
+        //         "type": "Point",
+        //         "coordinates": [
+        //             139.95027239072502 + 0.01,
+        //             36.554560344660054 + 0.01,
+        //         ]
+        //     }
+        // },
+        // {
+        //     "type": "Feature",
+        //     "properties": {
+        //         "title": "Train B",
+        //         "popupContent": "Train B",
+        //         "show_on_map": false
+        //     },
+        //     "geometry": {
+        //         "type": "Point",
+        //         "coordinates": [
+        //             139.95027239072502 - 0.01,
+        //             36.554560344660054 - 0.01,
+        //         ]
+        //     }
+        // },
         {
             "type": "Feature",
             "properties": {},
@@ -61,19 +64,71 @@ const geojsonData = {
     ]
 }
 
+const countryStyle = {
+    fillColor: "red",
+    fillOpacity: 1,
+    color: "black",
+    weight: 2
+};
 
+// https://codesandbox.io/p/sandbox/basic-usage-with-react-leaflet-v3-forked-2smi9y?file=%2Fsrc%2Findex.tsx%3A5%2C45
 function MapComponent() {
     const { ws, messages, locations } = useContext(WebSocketContext);
-    const [markers, setMarkers] = useState(geojsonData);
+    const [markers, setMarkers] = useState({});
+
+    const mapid = 'mapid';
+    // s: サブドメイン（不可分散に利用） z: ズームレベル x: タイルのx座標 y: タイルのy座標
+    const tileurl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const maxZoom = 19;
+    const attribution = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+    const centerPoint = [36.554560344660054, 139.95027239072502];
+    const zoomlevel = 13;
+
+    const onEachFeature = (country, layer) => {
+        const countryName = country.properties.title;
+        layer.bindPopup(countryName);
+        // layer.options.fillColor = "grey";
+    };
+
+    const listenEvent = (event) => {
+        const key = 1;
+
+        event.tags.forEach(elm => {
+            if (elm[0] === "g") {
+                const pos = geohash.decode(elm[1]);
+                setMarkers({
+                    ...markers,
+                    [key]: {lat: pos.latitude, lng: pos.longitude}
+                });
+            }
+        });
+    };
+
+    WebSocketKindHandlers[1].push(listenEvent);
 
     return (
-        <div>
-            <label>layer geojson</label>
-            <input
-                    type="text"
-                    value={markers}
-                    onChange={(e) => setMarkers(JSON.parse(e.target.value))}
-            />
+        <div align="center">
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+            <MapContainer
+                style={{ height: "1000px", width: "1000px", "color": "blue", "opacity": 0.65 }}
+                zoom={zoomlevel}
+                center={centerPoint}
+                scrollWheelZoom={true}
+              >
+                <TileLayer
+                    attribution={attribution}
+                    url={tileurl}
+                    maxZoom={maxZoom}
+                />
+                <GeoJSON
+                    style={countryStyle}
+                    data={geojsonData}
+                    onEachFeature={onEachFeature}
+                />
+                {Object.entries(markers).map(([key, position]) => (
+                    <Marker key={key} position={[position.lat, position.lng]} />
+                ))}
+          </MapContainer>
         </div>
     );
 }

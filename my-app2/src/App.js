@@ -1,9 +1,13 @@
 import logo from './logo.svg';
 import './App.css';
+import ReactDOM from 'react-dom';
+
+
 import WebSocketComponent from './components/WebSocketComponent';
 import MapComponent from './components/MapComponent';
 import PostComponent from './components/PostComponent';
 import SendPositionComponent from './components/SendPositionComponent';
+
 
 // function App() {
 //   return (
@@ -30,13 +34,26 @@ function App() {
   const data = [];
   return (
       <div className="App">
-          <h1>WebSocket Demo</h1>
+          <h1>Nostr tracking Demo</h1>
           <WebSocketComponent>
             <SendPositionComponent/>
             <PostComponent/>
+            <MapComponent/>
           </WebSocketComponent>
       </div>
   );
 }
 
 export default App;
+
+// function App() {
+//   return ReactDOM.render(
+//     <App>
+//       <h1>WebSocket Demo</h1>
+//         <WebSocketComponent>
+//           <SendPositionComponent/>
+//           <PostComponent/>
+//         </WebSocketComponent>
+//     </App>
+//   );  
+// }

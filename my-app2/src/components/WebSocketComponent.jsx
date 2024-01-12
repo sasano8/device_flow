@@ -1,7 +1,9 @@
 import React, { useState, useEffect, createContext } from 'react';
 import GetWebSocket from '../providers/WebSocketProvider';
+import geohash from "ngeohash";
 
 export const WebSocketContext = createContext(null);
+export const WebSocketKindHandlers = {1: []};
 
 export const WebSocketComponent = ({ children }) => {
     const [wsMode, setWsMode] = useState('mock');
@@ -25,7 +27,37 @@ export const WebSocketComponent = ({ children }) => {
 
         webSocket.onmessage = (event) => {
             setRecievedAt(new Date().toLocaleString());
-            setMsg(event.data);
+            const message = JSON.parse(event.data);
+            switch (message[0]) {
+                case "EVENT":
+                    // ["EVENT", subscription_id, {}]
+
+                    if (message[1]) {
+                    } else {
+                    }
+
+                    const event = message[2];
+                    if (event.kind in WebSocketKindHandlers) {
+                        const funcs = WebSocketKindHandlers[event.kind];
+                        funcs.forEach((func) => {
+                            func(event);
+                        });
+                    } else {
+                    }
+                    break;
+                case "EOSE":
+                    // ["EOSE", subscription_id]
+                    break;
+                case "NOTICE":
+                    // ["NOTICE", "message"]
+                    break;
+                case "OK":
+                    // ["OK", event_id, true || false, "message"]
+                    break;
+                case "CLOSED":
+                    // ["CLOSED", subscription_id, "message"]
+                    break;
+            }
         };
 
         webSocket.onclose = () => {
